@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+
+</head>
+
+<body>
+    <div>
+    <form>
+        <div class="form-group">
+            <label for="empid">Employee ID</label>
+            <input type="text" class="form-control" id="empid" aria-describedby="emailHelp" placeholder="EnterID">
+        </div>
+        <div class="form-group">
+            <label for="empname">name</label>
+            <input type="text" class="form-control" id="empname" placeholder="name">
+        </div>
+        <div class="form-group">
+            <label for="empemail">email</label>
+            <input type="email" class="form-control" id="empemail" placeholder="email">
+        </div>
+        
+        <input type="buttton" class="btn btn-primary" id="empsave" value="save" onclick="saveemp()" input>
+    </form>
+</div>
+<script>
+    function validateAndGetFormData() {
+        var empIdVar = $("#empid").val();
+        if (empIdVar === "") {
+            alert("Employee ID Required Value");
+            $("#empid").focus();
+            return "";
+        }
+    
+        var empNameVar = $("#empname").val();
+        if (empNameVar === "") {
+            alert("Employee Name is Required Value");
+            $("#empname").focus();
+            return "";
+        }
+    
+        var empEmailVar = $("#empemail").val();
+        if (empEmailVar === "") {
+            alert("Employee Email is Required Value");
+            $("#empemail").focus();
+            return "";
+        }
+    
+        var jsonStrObj = {
+            empid: empIdVar,
+            empname: empNameVar,
+            empemail: empEmailVar,
+        };
+        return JSON.stringify(jsonStrObj);
+    }
+    
+    function createPUTRequest(connToken, jsonObj, dbName, relName) {
+        var putRequest = "{\n"
+            + "\"token\" : \""
+            + connToken
+            + "\","
+            + "\"dbName\": \""
+            + dbName
+            + "\",\n" + "\"cmd\" : \"PUT\",\n"
+            + "\"rel\" : \""
+            + relName + "\",\n"
+            + "\"jsonStr\" : " + jsonObj + "\n"
+            + "}";
+            return putRequest;
+         
+    }
+
+    function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+        var url = dbBaseUrl + apiEndPointUrl;
+        var jsonObj;
+        $.post(url, reqString, function (result) {
+            jsonObj = JSON.parse(result);
+        }).fail(function (result) {
+            var dataJsonObj = result.responseText;
+            jsonObj = JSON.parse(dataJsonObj);
+        });
+        return jsonObj;
+    }
+    
+    function resetForm() {
+        $("#empid").val("");
+        $("#empname").val("");
+        $("#empemail").val("");
+        $("#empid").focus();
+    }
+    
+
+
+    function saveemp(){
+        var jsonStr = validateAndGetFormData();
+        if(jsonStr===""){
+            return;
+        }
+        var putReqStr = createPUTRequest("90934316|-31949204488571811|90957810",jsonStr, "Employee","Employee-Rel");
+        alert(putReqStr);
+        jQuery.ajaxSetup({async:false});
+        var result = executeCommand(putReqStr, "http://api.login2explore.com:5577" ,"/api/iml");
+        jQuery.ajaxSetup({async : true});
+        alert(JSON.stringify(result));
+        
+        resetForm();
+    
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+     
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
